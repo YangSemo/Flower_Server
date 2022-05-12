@@ -10,7 +10,7 @@ from keras.utils.np_utils import to_categorical
 
 import numpy as np
 
-import dataset
+import health_dataset as dataset
 
 
 def main() -> None:
