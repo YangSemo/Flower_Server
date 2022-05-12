@@ -6,6 +6,7 @@ echo "Starting server"
 python server.py &
 sleep 3  # Sleep for 3s to give the server enough time to start
 
+# client 수 설정
 for i in `seq 0 9`; do
     echo "Starting client $i"
     python /Users/yangsemo/VScode/Flower_Health/Flower_client/client.py --partition=${i} &

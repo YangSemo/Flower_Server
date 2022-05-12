@@ -12,6 +12,11 @@ import numpy as np
 
 import health_dataset as dataset
 
+import wandb
+
+# wandb login and init
+wandb.login(key='6266dbc809b57000d78fb8b163179a0a3d6eeb37')
+wandb.init(entity='ccl-fl', project='flower',config={"epochs": 4, "batch_size": 32,"val_steps": 4})
 
 def main() -> None:
     # Load and compile model for
@@ -79,6 +84,10 @@ def get_eval_fn(model):
         # loss, accuracy, precision, recall, auc, prc = model.evaluate(x_val, y_val)
         # return loss, {"accuracy": accuracy, "precision": precision, "recall": recall, "auc": auc, "prc": prc}
         loss, accuracy, precision, recall, auc, auprc = model.evaluate(x_val, y_val)
+        
+        # wandb에 log upload
+        wandb.log({'loss':loss,"accuracy": accuracy})
+        
         return loss, {"accuracy": accuracy, "precision": precision, "recall": recall, "auc": auc, "auprc": auprc}
 
         # loss, accuracy, precision, recall, auc, f1_score, auprc = model.evaluate(x_val, y_val)
@@ -93,12 +102,20 @@ def fit_config(rnd: int):
     Keep batch size fixed at 32, perform two rounds of training with one
     local epoch, increase to two local epochs afterwards.
     """
+    
+    batch_size =32
+    local_epochs = 10
+
     config = {
-        "batch_size": 32,
+        "batch_size": batch_size,
         # "local_epochs": 1 if rnd < 2 else 2,
-        "local_epochs": 15,
+        "local_epochs": local_epochs,
 
     }
+
+    # wandb log upload
+    wandb.config.update({"local_epochs": local_epochs, "batch_size": batch_size},allow_val_change=True)
+
     return config
 
 
@@ -111,8 +128,14 @@ def evaluate_config(rnd: int):
     # val_steps = 5 if rnd < 4 else 10
     val_steps = 5
 
+    # wandb log upload
+    wandb.config.update({"val_steps": val_steps},allow_val_change=True)
+    
     return {"val_steps": val_steps}
 
 
 if __name__ == "__main__":
     main()
+
+    # wandb 종료
+    wandb.finish()
